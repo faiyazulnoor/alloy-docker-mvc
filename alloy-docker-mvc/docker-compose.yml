@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  db:
+    build:
+      dockerfile: ./Docker/db.dockerfile
+      context: .
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_DIRECTORY: ${DB_DIRECTORY}
+    ports:
+      - 6000:1433
+    volumes:
+      - ./App_Data:/var/opt/mssql/host_data/${DB_DIRECTORY}
+    image: alloy-docker-mvc/db
+    restart: on-failure
+
+  web:
+    depends_on:
+      - db
+      - tika
+      - fop
+      - solr
+    build:
+      dockerfile: ./Docker/web.dockerfile
+      context: .
+    environment:
+      ASPNETCORE_URLS: http://*:80
+      ASPNETCORE_ENVIRONMENT: Development
+      CONNECTIONSTRINGS__EPISERVERDB: Server=db;Database=${DB_NAME};User Id=sa;Password=${SA_PASSWORD};Encrypt=False;
+      TIKA_URL: http://tika:9998
+      FOP_URL: http://fop:8080
+      SOLR_URL: http://solr:8983/solr
+    ports:
+      - 5000:80
+    volumes:
+      - .:/src
+    image: alloy-docker-mvc/web
+    restart: on-failure
+
+  tika:
+    image: apache/tika:latest
+    container_name: tika-server
+    ports:
+      - "9998:9998"
+    restart: unless-stopped
+    mem_limit: 2g
+
+  fop:
+    build: ./fop
+    container_name: fop-server
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    mem_limit: 1g
+
+  solr:
+    image: solr:latest
+    container_name: solr-server
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/solr
+    command:
+      - solr-precreate
+      - documents
+    restart: unless-stopped
+    mem_limit: 2g
+
+volumes:
+  solr_data:
