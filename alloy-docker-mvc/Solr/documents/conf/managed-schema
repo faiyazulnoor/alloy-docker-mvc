@@ -1,0 +1,16 @@
+<schema name="documentSchema" version="1.6">
+  
+  <uniqueKey>id</uniqueKey>
+
+  <field name="id"          type="string"  indexed="true" stored="true" required="true" />
+  <field name="content"     type="text_general" indexed="true" stored="false" />
+<!--stored=false on content means Solr keeps it searchable 
+but doesn’t return the entire text back to clients unless explicitly needed. 
+You can change to stored=true if you want to retrieve content back.
+  -->
+  <field name="title"       type="text_general" indexed="true" stored="true" />
+  <field name="doctype"     type="string" indexed="true" stored="true" />
+  <field name="path"        type="string" indexed="true" stored="true" />
+  <field name="created"     type="pdate" indexed="true" stored="true" />
+
+</schema>

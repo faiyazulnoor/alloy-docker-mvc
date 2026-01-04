@@ -1,19 +1,24 @@
 using alloy_docker_mvc.Extensions;
+using alloy_docker_mvc.Models;
+using alloy_docker_mvc.Services;
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using SolrNet;
 
 namespace alloy_docker_mvc
 {
     public class Startup
     {
         private readonly IWebHostEnvironment _webHostingEnvironment;
+        private readonly IConfiguration _configuration;
 
-        public Startup(IWebHostEnvironment webHostingEnvironment)
+        public Startup(IWebHostEnvironment webHostingEnvironment, IConfiguration configuration)
         {
             _webHostingEnvironment = webHostingEnvironment;
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -21,7 +26,6 @@ namespace alloy_docker_mvc
             if (_webHostingEnvironment.IsDevelopment())
             {
                 AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(_webHostingEnvironment.ContentRootPath, "App_Data"));
-
                 services.Configure<SchedulerOptions>(options => options.Enabled = false);
             }
 
@@ -41,6 +45,23 @@ namespace alloy_docker_mvc
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            // Register SolrNet
+            var solrUrl = _configuration["Solr:Url"] ?? "http://solr:8983/solr/documents";
+            services.AddSolrNet<SolrDocument>(solrUrl);
+
+            // Register SmartContentExtractor as singleton
+            services.AddSingleton<SmartContentExtractor>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                return new SmartContentExtractor(
+                    config["Tika:Url"] ?? "http://tika:9998/",
+                    config["Fop:Url"] ?? "http://fop:8080/"
+                );
+            });
+
+            // Register SolrIndexService with DI
+            services.AddSingleton<SolrIndexService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -53,7 +74,6 @@ namespace alloy_docker_mvc
             // Required by Wangkanai.Detection
             app.UseDetection();
             app.UseSession();
-
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+  <!-- Use the Classic schema factory -->
+  <schemaFactory class="ClassicIndexSchemaFactory" />
+
+  <!-- Update handler -->
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <autoCommit>
+      <maxTime>10000</maxTime>
+      <openSearcher>true</openSearcher>
+    </autoCommit>
+  </updateHandler>
+
+  <!-- Request handlers -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <int name="rows">10</int>
+      <str name="df">content</str>
+    </lst>
+  </requestHandler>
+
+  <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
+  <requestHandler name="/admin/ping" class="solr.PingRequestHandler"/>
+
+  <!-- Standard query settings -->
+  <query>
+    <maxBooleanClauses>1024</maxBooleanClauses>
+  </query>
+
+</config>
