@@ -1,11 +1,11 @@
 using alloy_docker_mvc.Extensions;
 using alloy_docker_mvc.Models;
-using alloy_docker_mvc.Services;
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using Services;
 using SolrNet;
 
 namespace alloy_docker_mvc

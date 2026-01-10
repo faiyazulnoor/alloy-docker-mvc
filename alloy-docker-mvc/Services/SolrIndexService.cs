@@ -1,7 +1,7 @@
 ﻿using alloy_docker_mvc.Models;
 using SolrNet;
 
-namespace alloy_docker_mvc.Services
+namespace Services
 {
     public class SolrIndexService
     {

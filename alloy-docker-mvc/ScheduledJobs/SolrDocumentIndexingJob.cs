@@ -5,10 +5,10 @@ using EPiServer.Web;
 using EPiServer.Framework.Blobs;
 using System.Text.Json;
 using alloy_docker_mvc.Models;
-using alloy_docker_mvc.Services;
 using EPiServer.Web.Routing;
+using Services;
 
-namespace alloy_docker_mvc.ScheduledJobs
+namespace ScheduledJobs
 {
     [ScheduledPlugIn(
         DisplayName = "Index FO and PDF Documents to Solr",

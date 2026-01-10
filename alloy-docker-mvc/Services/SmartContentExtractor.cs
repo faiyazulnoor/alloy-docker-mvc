@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Text;
 using System.Text.Json;
 
-namespace alloy_docker_mvc.Services
+namespace Services
 {
     public class SmartContentExtractor : IDisposable
     {
